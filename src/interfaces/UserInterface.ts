@@ -9,6 +9,18 @@ interface IUser {
   userType: number;
   createdAt: string;
   savedListings: string[];
+  savedFilters: {
+    location: {
+      city: string;
+      district: string;
+    };
+    priceRange: {
+      min: number;
+      max: number;
+    };
+    propertyType: string;
+    listingType: string;
+  }[];
 }
 
 interface IUserInputDTO extends Partial<IUser> {

@@ -1,10 +1,22 @@
-import { useEffect } from "react";
+import {
+  Bars3Icon,
+  BellIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRecoilState, useSetRecoilState } from "recoil";
+
 import { authState } from "../atoms/globalAtoms";
-import { userListingsState } from "../atoms/userAtoms";
+import {
+  userListingsState,
+  userNotificationsState,
+  userSavedListingsState,
+} from "../atoms/userAtoms";
 import AuthServices from "../services/AuthServices";
 import ListingServices from "../services/ListingService";
+import NotificationServices from "../services/NotificationService";
+import UserServices from "../services/UserServices";
 
 type Props = {
   setSidebarOpen: (open: boolean) => void;
@@ -16,6 +28,19 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
 
   const [auth, setAuth] = useRecoilState(authState);
   const setUserListings = useSetRecoilState(userListingsState);
+  const setUserSavedListings = useSetRecoilState(userSavedListingsState);
+  const [userNotifications, setUserNotifications] = useRecoilState(
+    userNotificationsState
+  );
+
+  const [notificationPopoverOpen, setNotificationPopoverOpen] = useState(false);
+
+  const markAllAsRead = async () => {
+    // mark all notifications as read
+    for (const notification of userNotifications) {
+      await NotificationServices.UpdateReadStatus(notification._id);
+    }
+  };
 
   useEffect(() => {
     const validateUser = async () => {
@@ -43,12 +68,21 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
   useEffect(() => {
     const fetchUserListings = async () => {
       const response = await ListingServices.GetUsersListings();
+      const savedListings = await UserServices.GetUSerSavedListings();
 
       setUserListings(response);
+      setUserSavedListings(savedListings);
+    };
+
+    const fetchUserNotifications = async () => {
+      const response = await NotificationServices.GetNotifications();
+
+      setUserNotifications(response);
     };
 
     if (auth.isAuth) {
       fetchUserListings();
+      fetchUserNotifications();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.isAuth]);
@@ -85,20 +119,7 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
             onClick={() => setSidebarOpen(true)}
           >
             <span className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-                strokeWidth={3}
-                className="h-6 w-6 text-blue-gray-500"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Bars3Icon className="h-5 w-5 text-blue-gray-500" />
             </span>
           </button>
 
@@ -106,19 +127,7 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
             className="middle none font-sans font-bold center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 hidden items-center gap-1 px-4 xl:flex"
             type="button"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              className="h-5 w-5 text-blue-gray-500"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
             <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
               {`${auth.user?.firstName} ${auth.user?.lastName}`}
             </p>
@@ -128,44 +137,94 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
             type="button"
           >
             <span className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-                className="h-5 w-5 text-blue-gray-500"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
             </span>
           </button>
           <button
             aria-expanded="false"
             aria-haspopup="menu"
             id=":r2:"
-            className="relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30"
+            className="hidden lg:block relative middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-10 max-w-[40px] h-10 max-h-[40px] rounded-lg text-xs text-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30"
             type="button"
+            onClick={() => setNotificationPopoverOpen(!notificationPopoverOpen)}
           >
             <span className="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-                className="h-5 w-5 text-blue-gray-500"
+              <BellIcon className="h-5 w-5 text-blue-gray-500" />
+              {/* count of all unread notifications */}
+              <span
+                className={`${
+                  userNotifications.some((notification) => !notification.read)
+                    ? "block"
+                    : "hidden"
+                } absolute top-0 right-0 -mt-1 -mr-1 px-1.5 rounded-full bg-red-500 text-xs text-white`}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
+                {
+                  userNotifications.filter((notification) => !notification.read)
+                    .length
+                }
+              </span>
             </span>
           </button>
+          {/* create a popup show most recent 3 notifications that opens when click the button */}
+          <div
+            className={`${
+              notificationPopoverOpen ? "hidden lg:block" : "hidden"
+            } origin-top-right absolute top-16 right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5`}
+          >
+            <div
+              className="py-1"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="options-menu"
+            >
+              <ul className="flex flex-col gap-2">
+                {userNotifications.map((notification) => (
+                  <li
+                    key={notification._id}
+                    className="flex items-center justify-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 space-x-4"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: notification.read
+                            ? "transparent"
+                            : "green",
+                        }}
+                      ></div>
+                    </div>
+                    <p className="text-xs">{notification.message}</p>
+                  </li>
+                ))}
+              </ul>
+
+              {/* View all  */}
+              <div className="flex w-full items-center justify-between">
+                <button
+                  className="flex items-center justify-center px-4 py-2 text-sm text-gray-700 hover:bg-green-300 w-full bg-green-100 disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none disabled:hover:bg-gray-100"
+                  onClick={async () => {
+                    setNotificationPopoverOpen(false);
+                    await markAllAsRead();
+                    // navigate("/dashboard/notifications");
+                  }}
+                  disabled={userNotifications.every(
+                    (notification) => notification.read
+                  )}
+                >
+                  <p className="text-xs">Mark All as Read</p>
+                </button>
+                <button
+                  className="flex items-center justify-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 w-full bg-gray-100 "
+                  onClick={() => {
+                    setNotificationPopoverOpen(false);
+                    navigate("/dashboard/notifications");
+                  }}
+                >
+                  <p className="text-xs">View all</p>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </nav>

@@ -12,6 +12,18 @@ function Register() {
   const navigate = useNavigate();
 
   const [cities, setCities] = useState<ICity[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [errorMessages, setErrorMessages] = useState<any[]>([]);
+
+  const errorMapper = (path: string) => {
+    const error = errorMessages.find((err) => err.path.includes(path));
+
+    if (error) {
+      return error.message;
+    } else {
+      return "";
+    }
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,6 +35,7 @@ function Register() {
     const password = e.currentTarget.password.value;
     const confirmPassword = e.currentTarget.confirmPassword.value;
     const userType = e.currentTarget.userType.value;
+    const location = e.currentTarget.location.value;
     const profilePic =
       "https://thinksport.com.au/wp-content/uploads/2020/01/avatar-.jpg";
 
@@ -35,11 +48,16 @@ function Register() {
       confirmPassword,
       userType: parseInt(userType),
       profilePic,
+      location,
+      savedListings: [],
+      savedFilters: [],
     });
 
     if (response.email === email) {
       alert("User created successfully");
       navigate("/auth/login");
+    } else {
+      setErrorMessages(response);
     }
   };
 
@@ -54,8 +72,20 @@ function Register() {
         onSubmit={onSubmit}
       >
         <div className="lg:flex items-center justify-center w-full max-w-[900px]">
-          <TextField label="First Name" placeholder="First Name" id="fName" />
-          <TextField label="Last Name" placeholder="Last Name" id="lName" />
+          <TextField
+            label="First Name"
+            placeholder="First Name"
+            id="fName"
+            isRequired
+            errorMessage={errorMapper("firstName")}
+          />
+          <TextField
+            label="Last Name"
+            placeholder="Last Name"
+            id="lName"
+            isRequired
+            errorMessage={errorMapper("lastName")}
+          />
         </div>
         <div className="lg:flex items-center justify-center w-full max-w-[900px]">
           <TextField
@@ -63,12 +93,16 @@ function Register() {
             placeholder="Email"
             id="email"
             type="email"
+            isRequired
+            errorMessage={errorMapper("email")}
           />
           <TextField
             label="Phone Number"
             placeholder="Phone Number"
             id="phone"
             type="tel"
+            isRequired
+            errorMessage={errorMapper("phoneNum")}
           />
         </div>
         <div className="lg:flex items-center justify-center w-full max-w-[900px]">
@@ -77,18 +111,24 @@ function Register() {
             placeholder="Password"
             id="password"
             type="password"
+            isRequired
+            errorMessage={errorMapper("password")}
           />
           <TextField
             label="Confirm Password"
             placeholder="Confirm Password"
             id="confirmPassword"
             type="password"
+            isRequired
+            errorMessage={errorMapper("confirmPassword")}
           />
         </div>
         <div className="lg:flex items-center justify-center w-full max-w-[900px]">
           <DropDown
             label="User Type"
             id="userType"
+            isRequired
+            errorMessage={errorMapper("userType")}
             items={[
               {
                 label: "Buyer",
@@ -108,6 +148,8 @@ function Register() {
           <DropDown
             label="Location"
             id="location"
+            isRequired
+            errorMessage={errorMapper("location")}
             items={cities.map((city) => ({
               label: city.city,
               value: city.code,

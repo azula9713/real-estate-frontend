@@ -11,7 +11,10 @@ import {
   FindProperties,
   Home,
   Login,
+  Notifications,
   Register,
+  Support,
+  ViewListing,
 } from "./pages";
 import AuthServices from "./services/AuthServices";
 import ConnectionServices from "./services/ConnectionService";
@@ -32,6 +35,10 @@ function App() {
     {
       path: "/find-listings",
       element: <FindProperties />,
+    },
+    {
+      path: "/support",
+      element: <Support />,
     },
     {
       path: "/auth",
@@ -59,7 +66,7 @@ function App() {
         // },
         {
           path: "/listing/view/:id",
-          element: <Home />,
+          element: <ViewListing />,
         },
         // {
         //   path: "/listing/edit/:id",
@@ -77,6 +84,10 @@ function App() {
         {
           path: "/dashboard/profile",
           element: <DashProfile />,
+        },
+        {
+          path: "/dashboard/notifications",
+          element: <Notifications />,
         },
       ],
     },

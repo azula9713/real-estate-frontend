@@ -1,12 +1,20 @@
 import { IUser } from "./UserInterface";
 
-interface IListingDTO {
+interface BaseListing {
   title: string;
   description: string;
   price: number;
   location: string;
-  listingType: string;
+  listingType: "rent" | "sale" | "lease";
+  propertyType: "apartment" | "house" | "office" | "land" | "commercial";
   photos: string[];
+  clickCount: number;
+  isAccepted: boolean;
+  isPublished: boolean;
+}
+
+interface IListingDTO extends BaseListing {
+  listedUnder: string;
 }
 
 interface IListing extends IListingDTO {
@@ -14,8 +22,14 @@ interface IListing extends IListingDTO {
   createdAt: Date;
   updatedAt: Date;
   createdBy: IUser;
-  listedUnder: IUser;
-  clickCount: number;
 }
 
-export type { IListing, IListingDTO };
+interface IListingExpanded extends BaseListing {
+  listedUnder: IUser;
+  _id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: IUser;
+}
+
+export type { IListing, IListingDTO, IListingExpanded };

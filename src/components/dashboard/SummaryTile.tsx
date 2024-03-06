@@ -1,19 +1,14 @@
 type Props = {
   summaryTitle: string;
-  lastPeriod: string;
-  percentChange: number;
   icon: React.ReactNode;
   summaryValue: string;
-  marginColor: "red" | "green" | "gray";
 };
 
 function SummaryTile({
   summaryTitle,
-  lastPeriod,
-  percentChange,
+
   icon,
   summaryValue,
-  marginColor,
 }: Readonly<Props>) {
   return (
     <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
@@ -26,7 +21,7 @@ function SummaryTile({
           {summaryValue}
         </h4>
       </div>
-      <div className="border-t border-blue-gray-50 p-4">
+      {/* <div className="border-t border-blue-gray-50 p-4">
         <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
           <strong
             style={{
@@ -39,7 +34,7 @@ function SummaryTile({
           &nbsp;
           {`than ${lastPeriod}`}
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }

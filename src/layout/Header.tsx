@@ -86,7 +86,7 @@ function Header() {
           </Navbar.Link>
         )}
 
-        <Navbar.Link href="#">Support</Navbar.Link>
+        <Navbar.Link onClick={() => navigate("/support")}>Support</Navbar.Link>
         {!auth.isAuth && location.pathname !== "/auth/login" && (
           <Navbar.Link
             className="ml-auto"

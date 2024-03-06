@@ -21,6 +21,23 @@ const getMyConnections = async () => {
   return response.data;
 };
 
+const updateConnection = async (
+  connectionId: string,
+  connection: IConnectionDTO
+) => {
+  const response = await Server.put(
+    `/connections/update/${connectionId}`,
+    connection,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "x-refresh": localStorage.getItem("refreshToken") ?? "",
+      },
+    }
+  );
+  return response.data;
+};
+
 const cancelConnection = async (connectionId: string) => {
   const response = await Server.delete(`/connections/cancel/${connectionId}`, {
     headers: {
@@ -35,6 +52,7 @@ const ConnectionServices = {
   createConnection,
   getMyConnections,
   cancelConnection,
+  updateConnection,
 };
 
 export default ConnectionServices;

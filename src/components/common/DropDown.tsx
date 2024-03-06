@@ -10,6 +10,7 @@ type Props = {
   isRequired?: boolean;
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  errorMessage?: string;
 };
 
 function DropDown({
@@ -19,9 +20,10 @@ function DropDown({
   isRequired = false,
   value,
   onChange,
+  errorMessage,
 }: Readonly<Props>) {
   return (
-    <div className="w-full p-3 sm:w-1/2">
+    <div className="w-full p-3 lg:w-1/2">
       <div className="mb-2 block">
         <Label htmlFor={id} value={label} />
       </div>
@@ -32,6 +34,11 @@ function DropDown({
           </option>
         ))}
       </Select>
+      {errorMessage && (
+        <div className="mt-4 text-red-500">
+          <p>{errorMessage}</p>
+        </div>
+      )}
     </div>
   );
 }

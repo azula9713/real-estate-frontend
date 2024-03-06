@@ -16,17 +16,8 @@ const GetAllListings = async () => {
   return response.data;
 };
 
-const UpdateListing = async (listingData: IListing, listingId: string) => {
-  const response = await Server.put(
-    `/listings/update/${listingId}`,
-    listingData,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        "x-refresh": localStorage.getItem("refreshToken") ?? "",
-      },
-    }
-  );
+const GetListing = async (listingId: string) => {
+  const response = await Server.get(`/listings/view/${listingId}`);
   return response.data;
 };
 
@@ -40,11 +31,39 @@ const GetUsersListings = async () => {
   return response.data;
 };
 
+const UpdateListing = async (listingData: IListing) => {
+  const listingId = listingData._id;
+
+  const response = await Server.put(
+    `/listings/update/${listingId}`,
+    listingData,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        "x-refresh": localStorage.getItem("refreshToken") ?? "",
+      },
+    }
+  );
+  return response.data;
+};
+
+const DeleteListing = async (listingId: string) => {
+  const response = await Server.delete(`/listings/delete/${listingId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      "x-refresh": localStorage.getItem("refreshToken") ?? "",
+    },
+  });
+  return response.data;
+};
+
 const ListingServices = {
   CreateListing,
   GetAllListings,
   UpdateListing,
   GetUsersListings,
+  DeleteListing,
+  GetListing,
 };
 
 export default ListingServices;

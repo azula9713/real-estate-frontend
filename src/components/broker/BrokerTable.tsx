@@ -86,40 +86,42 @@ function BrokerTable({ brokerData }: Readonly<Props>) {
         </Table.HeadCell>
       </Table.Head>
       <Table.Body className="divide-y">
-        {brokerData.map((broker) => (
-          <Table.Row
-            className="bg-white dark:border-gray-700 dark:bg-gray-800"
-            key={broker._id}
-          >
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              {broker.firstName} {broker.lastName}
-            </Table.Cell>
-            <Table.Cell>{broker.email}</Table.Cell>
-            <Table.Cell>{broker.location}</Table.Cell>
-            <Table.Cell>$2999</Table.Cell>
-            <Table.Cell>
-              <button
-                className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-                disabled={!auth.isAuth || auth.user.userType === 2}
-                onClick={async () => {
-                  // await addToMyList(broker._id);
-                  switch (getConnectionStatus(broker._id)) {
-                    case "Add to my list":
-                      await addToMyList(broker._id);
-                      break;
-                    case "Cancel request":
-                      await cancelRequest(broker._id);
-                      break;
-                    default:
-                      break;
-                  }
-                }}
-              >
-                {getConnectionStatus(broker._id)}
-              </button>
-            </Table.Cell>
-          </Table.Row>
-        ))}
+        {brokerData
+          .filter((broker) => broker._id !== auth.user._id)
+          .map((broker) => (
+            <Table.Row
+              className="bg-white dark:border-gray-700 dark:bg-gray-800"
+              key={broker._id}
+            >
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                {broker.firstName} {broker.lastName}
+              </Table.Cell>
+              <Table.Cell>{broker.email}</Table.Cell>
+              <Table.Cell>{broker.location}</Table.Cell>
+              <Table.Cell>$2999</Table.Cell>
+              <Table.Cell>
+                <button
+                  className="font-medium text-cyan-600 hover:underline dark:text-cyan-500 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  disabled={!auth.isAuth || auth.user.userType === 2}
+                  onClick={async () => {
+                    // await addToMyList(broker._id);
+                    switch (getConnectionStatus(broker._id)) {
+                      case "Add to my list":
+                        await addToMyList(broker._id);
+                        break;
+                      case "Cancel request":
+                        await cancelRequest(broker._id);
+                        break;
+                      default:
+                        break;
+                    }
+                  }}
+                >
+                  {getConnectionStatus(broker._id)}
+                </button>
+              </Table.Cell>
+            </Table.Row>
+          ))}
       </Table.Body>
     </Table>
   );

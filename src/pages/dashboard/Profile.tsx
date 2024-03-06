@@ -1,16 +1,72 @@
+import {
+  CheckCircleIcon,
+  DocumentIcon,
+  PlusIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
+import {
+  PencilIcon,
+  CheckCircleIcon as SolidCheckCircleIcon,
+  TrashIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/solid";
 import moment from "moment";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 
 import { authState } from "../../atoms/globalAtoms";
-import { userListingsState } from "../../atoms/userAtoms";
+import { userConnectionsState, userListingsState } from "../../atoms/userAtoms";
+import AddListing from "../../components/modal/AddListing";
+import DeleteListing from "../../components/modal/DeleteListing";
+import EditListing from "../../components/modal/EditListing";
+import ViewConnections from "../../components/modal/ViewConnections";
+import { IListing } from "../../interfaces/ListingInterface";
 import DashboardLayout from "../../layout/DashboardLayout";
+import ListingServices from "../../services/ListingService";
+import isItMe from "../../utils/isItMe";
 import CityUtils from "../../utils/locationUtils";
 
 function DashProfile() {
   const auth = useRecoilValue(authState);
   const userListings = useRecoilValue(userListingsState);
+  const userConnections = useRecoilValue(userConnectionsState);
 
-  console.log("listings", userListings);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [connectionsModalOpen, setConnectionsModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<IListing | null>(null);
+
+  const changeListingPublishStatus = async (listing: IListing) => {
+    const updatedListing: IListing = {
+      ...listing,
+      isPublished: !listing.isPublished,
+    };
+
+    const response = await ListingServices.UpdateListing(updatedListing);
+
+    // if success, update the listing in the userListingsState
+    if (response) {
+      window.location.reload();
+    }
+  };
+
+  const changeListingAcceptStatus = async (
+    listing: IListing,
+    status: "accept" | "reject"
+  ) => {
+    const updatedListing: IListing = {
+      ...listing,
+      isAccepted: status === "accept",
+    };
+
+    const response = await ListingServices.UpdateListing(updatedListing);
+
+    // if success, update the listing in the userListingsState
+    if (response) {
+      window.location.reload();
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -56,34 +112,57 @@ function DashProfile() {
             <div className="my-4" />
             {/* Friends card */}
             <div className="bg-white p-3 hover:shadow">
-              <div className="flex items-center space-x-3 font-semibold text-gray-900 text-xl leading-8">
-                <span className="text-green-500">
-                  <svg
-                    className="h-5 fill-current"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </span>
-                <span>Connections</span>
+              <div className="flex items-center space-x-3 font-semibold text-gray-900 text-xl leading-8 justify-between">
+                <div className="flex items-center justify-start space-x-4">
+                  <span className="text-green-500">
+                    <UserGroupIcon className="h-5" />
+                  </span>
+                  <span>Connections</span>
+
+                  <span className="ml-auto bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    {userConnections.length}
+                  </span>
+                </div>
+
+                <button
+                  className="text-xs text-green-500 font-semibold hover:underline"
+                  onClick={() => {
+                    setConnectionsModalOpen(true);
+                  }}
+                >
+                  View All
+                </button>
               </div>
               <div className="grid grid-cols-3">
-                <div className="text-center my-2">
-                  <img
-                    className="h-16 w-16 rounded-full mx-auto"
-                    src="https://cdn.australianageingagenda.com.au/wp-content/uploads/2015/06/28085920/Phil-Beckett-2-e1435107243361.jpg"
-                    alt="user"
-                  />
-                  <p className="text-main-color">Kojstantin</p>
-                </div>
+                {userConnections.map((connection) => (
+                  <div className="text-center my-2" key={connection._id}>
+                    {/* get the other person's details instead of current logged in user */}
+
+                    <img
+                      className="h-16 w-16 rounded-full mx-auto"
+                      src={
+                        isItMe(connection.requestee._id, auth.user._id)
+                          ? connection.requester.profilePic
+                          : connection.requestee.profilePic
+                      }
+                      alt="user"
+                    />
+                    <div className="w-full flex items-end justify-center">
+                      <p className="p-0 m-0 mr-2">
+                        {isItMe(connection.requestee._id, auth.user._id)
+                          ? connection.requester.firstName
+                          : connection.requestee.firstName}
+                      </p>
+
+                      {/* if pending display a gray icon, if accepted display a green icon */}
+                      {connection.status === "pending" ? (
+                        <CheckCircleIcon className="h-5 w-5 text-gray-500 " />
+                      ) : (
+                        <SolidCheckCircleIcon className="h-5 w-5 text-green-500" />
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
             {/* End of friends card */}
@@ -95,20 +174,7 @@ function DashProfile() {
             <div className="bg-white p-3 shadow-sm rounded-sm">
               <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
                 <span className="text-green-500">
-                  <svg
-                    className="h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+                  <UserIcon className="h-5 w-5" />
                 </span>
                 <span className="tracking-wide">About</span>
               </div>
@@ -152,77 +218,125 @@ function DashProfile() {
             <div className="my-4" />
             {/* Experience and education */}
             <div className="bg-white p-3 shadow-sm rounded-sm">
-              <div className="grid grid-cols-2">
+              <div className="">
                 <div>
-                  <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8 mb-3">
-                    <span className="text-green-500">
-                      <svg
-                        className="h-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  <div className="flex items-center justify-between space-x-2 font-semibold text-gray-900 leading-8 mb-3">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-green-500">
+                        <DocumentIcon className="h-5 w-5" />
+                      </span>
+                      <span className="tracking-wide">
+                        {auth.user.userType === 1 || auth.user.userType === 2
+                          ? "My Listings"
+                          : "My Saved Listings"}
+                      </span>
+                    </div>
+                    {auth.user.userType === 1 || auth.user.userType === 2 ? (
+                      <span className="text-green-500 cursor-pointer">
+                        <PlusIcon
+                          className="h-5 w-5"
+                          onClick={() => {
+                            setAddModalOpen(true);
+                          }}
                         />
-                      </svg>
-                    </span>
-                    <span className="tracking-wide">
-                      {auth.user.userType === 1 || auth.user.userType === 2
-                        ? "My Listings"
-                        : "My Saved Listings"}
-                    </span>
+                      </span>
+                    ) : (
+                      <span className="text-green-500 cursor-pointer">
+                        <DocumentIcon className="h-5 w-5" />
+                      </span>
+                    )}
                   </div>
                   <ul className="list-inside space-y-2">
                     {userListings.map((listing) => (
-                      <li key={listing._id}>
-                        <div className="text-teal-600">{listing.title}</div>
-                        <div className="text-gray-500 text-xs">
-                          {moment(listing.createdAt).format("MMM D, YYYY")}
+                      <li
+                        key={listing._id}
+                        className="w-full flex items-center justify-between pr-2 pb-2 border-b"
+                      >
+                        <div>
+                          <div className="text-teal-600">{listing.title}</div>
+                          <div className="text-gray-500 text-xs">
+                            {moment(listing.createdAt).format("MMM D, YYYY")}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-end space-x-2">
+                          {/* if published display Unpublish, if not published show publish */}
+                          <button
+                            className="px-2 py-1 text-xs rounded font-semibold disabled:opacity-50 bg-green-500 text-white"
+                            onClick={() =>
+                              changeListingAcceptStatus(listing, "accept")
+                            }
+                            hidden={
+                              listing.isAccepted ||
+                              listing.createdBy._id === listing.listedUnder
+                            }
+                          >
+                            Accept Listing
+                          </button>
+                          <button
+                            className="px-2 py-1 text-xs rounded font-semibold disabled:opacity-50 bg-red-500 text-white"
+                            onClick={() =>
+                              changeListingAcceptStatus(listing, "reject")
+                            }
+                            hidden={listing.isAccepted}
+                          >
+                            Reject Listing
+                          </button>
+                          <button
+                            className={`
+                            px-2 py-1 text-xs rounded font-semibold disabled:opacity-50
+                            ${
+                              listing.isPublished
+                                ? "bg-red-500 text-white"
+                                : "bg-green-500 text-white"
+                            }`}
+                            disabled={!listing.isAccepted}
+                            onClick={() => changeListingPublishStatus(listing)}
+                          >
+                            {listing.isPublished ? "Unpublish" : "Publish"}
+                          </button>
+                          <PencilIcon
+                            className="h-4 w-4 text-gray-500 cursor-pointer"
+                            onClick={() => {
+                              setSelectedListing(listing);
+                              setEditModalOpen(true);
+                            }}
+                          />
+                          <TrashIcon
+                            className="h-4 w-4 text-red-500 cursor-pointer"
+                            onClick={() => {
+                              setSelectedListing(listing);
+                              setDeleteModalOpen(true);
+                            }}
+                          />
                         </div>
                       </li>
                     ))}
-
-                    {/* <li>
-                      <div className="text-teal-600">
-                        Owner at Her Company Inc.
-                      </div>
-                      <div className="text-gray-500 text-xs">
-                        March 2020 - Now
-                      </div>
-                    </li>
-                    <li>
-                      <div className="text-teal-600">
-                        Owner at Her Company Inc.
-                      </div>
-                      <div className="text-gray-500 text-xs">
-                        March 2020 - Now
-                      </div>
-                    </li>
-                    <li>
-                      <div className="text-teal-600">
-                        Owner at Her Company Inc.
-                      </div>
-                      <div className="text-gray-500 text-xs">
-                        March 2020 - Now
-                      </div>
-                    </li>
-                    <li>
-                      <div className="text-teal-600">
-                        Owner at Her Company Inc.
-                      </div>
-                      <div className="text-gray-500 text-xs">
-                        March 2020 - Now
-                      </div>
-                    </li> */}
                   </ul>
                 </div>
               </div>
               {/* End of Experience and education grid */}
+              {selectedListing && (
+                <>
+                  <EditListing
+                    listing={selectedListing}
+                    openModal={editModalOpen}
+                    setOpenModal={setEditModalOpen}
+                  />
+                  <DeleteListing
+                    listing={selectedListing}
+                    openModal={deleteModalOpen}
+                    setOpenModal={setDeleteModalOpen}
+                  />
+                </>
+              )}
+              <AddListing
+                openModal={addModalOpen}
+                setOpenModal={setAddModalOpen}
+              />
+              <ViewConnections
+                openModal={connectionsModalOpen}
+                setOpenModal={setConnectionsModalOpen}
+              />
             </div>
             {/* End of profile tab */}
           </div>
