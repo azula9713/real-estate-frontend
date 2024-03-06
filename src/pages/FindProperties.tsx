@@ -323,13 +323,15 @@ function FindProperties() {
             ))}
           </select>
         </div>
-        <button
-          className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          onClick={saveFilters}
-        >
-          <FunnelIcon className="h-6 w-6" />
-          Save Filter
-        </button>
+        {auth.isAuth && (
+          <button
+            className="flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={saveFilters}
+          >
+            <FunnelIcon className="h-6 w-6" />
+            Save Filter
+          </button>
+        )}
       </div>
 
       <div className="m-2 p-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
