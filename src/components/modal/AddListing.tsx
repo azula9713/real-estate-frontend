@@ -47,7 +47,7 @@ function AddListing({ openModal, setOpenModal }: Readonly<Props>) {
         price: parseInt(priceRef.current.value),
         location: locationRef.current.value,
         photos: imagesRef.current.value.split(","),
-        listedUnder: listingUnderRef.current.value,
+        listedUnder: listingUnderRef.current.value || auth.user._id,
         listingType: listingTypeRef.current.value as "rent" | "sale" | "lease",
         propertyType: propertyTypeRef.current.value as
           | "apartment"
@@ -75,215 +75,228 @@ function AddListing({ openModal, setOpenModal }: Readonly<Props>) {
       <Modal.Header>
         <label className="text-xl font-semibold">Add New Listing</label>
       </Modal.Header>
-      <Modal.Body>
-        <div className="space-y-6">
-          {/* Listing Form */}
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-white"
-            >
-              Title
-            </label>
-            <div className="mt-1">
-              <input
-                type="text"
-                name="title"
-                id="title"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                placeholder="Title"
-                ref={titleRef}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-white"
-            >
-              Description
-            </label>
-            <div className="mt-1">
-              <textarea
-                id="description"
-                name="description"
-                rows={4}
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                placeholder="Description"
-                ref={descriptionRef}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium text-white"
-            >
-              Price in LKR
-            </label>
-            <div className="mt-1">
-              <input
-                type="text"
-                name="price"
-                id="price"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                placeholder="Price"
-                ref={priceRef}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="images"
-              className="block text-sm font-medium text-white"
-            >
-              Images
-            </label>
-            <div className="mt-1">
-              <input
-                type="text"
-                name="images"
-                id="images"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                placeholder="Images"
-                ref={imagesRef}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              htmlFor="listingType"
-              className="block text-sm font-medium text-white"
-            >
-              Listing Type
-            </label>
-
-            <div className="mt-1">
-              <select
-                id="listingType"
-                name="listingType"
-                autoComplete="listingType"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                ref={listingTypeRef}
+      <form onSubmit={createListing}>
+        <Modal.Body>
+          <div className="space-y-6">
+            {/* Listing Form */}
+            <div>
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-white"
               >
-                <option value="rent">Rent</option>
-                <option value="sale">Sale</option>
-                <option value="lease">Lease</option>
-              </select>
+                Title
+              </label>
+              <div className="mt-1">
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Title"
+                  ref={titleRef}
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <label
-              htmlFor="propertyType"
-              className="block text-sm font-medium text-white"
-            >
-              Property Type
-            </label>
-
-            <div className="mt-1">
-              <select
-                id="propertyType"
-                name="propertyType"
-                autoComplete="propertyType"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                ref={propertyTypeRef}
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-white"
               >
-                <option value="apartment">Apartment</option>
-                <option value="house">House</option>
-                <option value="office">Office</option>
-                <option value="land">Land</option>
-                <option value="commercial">Commercial</option>
-              </select>
+                Description
+              </label>
+              <div className="mt-1">
+                <textarea
+                  id="description"
+                  name="description"
+                  rows={4}
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Description"
+                  ref={descriptionRef}
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <label
-              htmlFor="location"
-              className="block text-sm font-medium text-white"
-            >
-              Location
-            </label>
-
-            <div className="mt-1">
-              <select
-                id="location"
-                name="location"
-                autoComplete="location"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                ref={locationRef}
+            <div>
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-white"
               >
-                {cities.map((city, index) => (
-                  <option key={index} value={city.code}>
-                    {city.city}
-                  </option>
-                ))}
-              </select>
+                Price in LKR
+              </label>
+              <div className="mt-1">
+                <input
+                  type="number"
+                  name="price"
+                  id="price"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Price"
+                  ref={priceRef}
+                  required
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <label
-              htmlFor="listUnder"
-              className="block text-sm font-medium text-white"
-            >
-              List under
-            </label>
-
-            <div className="mt-1">
-              <select
-                id="listUnder"
-                name="listUnder"
-                autoComplete="listUnder"
-                className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                ref={listingUnderRef}
+            <div>
+              <label
+                htmlFor="images"
+                className="block text-sm font-medium text-white"
               >
-                {/* get accepted connections */}
-                <option value={auth.user._id}>Myself</option>
-                {userConnections
-                  .filter((connection) => connection.status === "accepted")
-                  .map((connection, index) => (
-                    <option
-                      key={index}
-                      value={
-                        // connection.requester._id === auth.user._id
-                        //   ? connection.requestee._id
-                        //   : connection.requester._id
-                        isItMe(connection.requester._id, auth.user._id)
-                          ? connection.requestee._id
-                          : connection.requester._id
-                      }
-                    >
-                      {/* {connection.requestee.firstName}{" "}
-                      {connection.requestee.lastName} */}
-                      {isItMe(connection.requester._id, auth.user._id)
-                        ? connection.requestee.firstName
-                        : connection.requester.firstName}{" "}
-                      {isItMe(connection.requester._id, auth.user._id)
-                        ? connection.requestee.lastName
-                        : connection.requester.lastName}
+                Images
+              </label>
+              <div className="mt-1">
+                <input
+                  type="text"
+                  name="images"
+                  id="images"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Enter the image URLs separated by commas"
+                  ref={imagesRef}
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="listingType"
+                className="block text-sm font-medium text-white"
+              >
+                Listing Type
+              </label>
+
+              <div className="mt-1">
+                <select
+                  id="listingType"
+                  name="listingType"
+                  autoComplete="listingType"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  ref={listingTypeRef}
+                  required
+                >
+                  <option value="rent">Rent</option>
+                  <option value="sale">Sale</option>
+                  <option value="lease">Lease</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="propertyType"
+                className="block text-sm font-medium text-white"
+              >
+                Property Type
+              </label>
+
+              <div className="mt-1">
+                <select
+                  id="propertyType"
+                  name="propertyType"
+                  autoComplete="propertyType"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  ref={propertyTypeRef}
+                  required
+                >
+                  <option value="apartment">Apartment</option>
+                  <option value="house">House</option>
+                  <option value="office">Office</option>
+                  <option value="land">Land</option>
+                  <option value="commercial">Commercial</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label
+                htmlFor="location"
+                className="block text-sm font-medium text-white"
+              >
+                Location
+              </label>
+
+              <div className="mt-1">
+                <select
+                  id="location"
+                  name="location"
+                  autoComplete="location"
+                  className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  ref={locationRef}
+                  required
+                >
+                  {cities.map((city, index) => (
+                    <option key={index} value={city.code}>
+                      {city.city}
                     </option>
                   ))}
-              </select>
+                </select>
+              </div>
             </div>
+            {auth.user.userType === 1 && (
+              <div>
+                <label
+                  htmlFor="listUnder"
+                  className="block text-sm font-medium text-white"
+                >
+                  List under
+                </label>
+
+                <div className="mt-1">
+                  <select
+                    id="listUnder"
+                    name="listUnder"
+                    autoComplete="listUnder"
+                    className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    ref={listingUnderRef}
+                  >
+                    {/* get accepted connections */}
+                    <option value={auth.user._id}>Myself</option>
+                    {userConnections
+                      .filter((connection) => connection.status === "accepted")
+                      .map((connection, index) => (
+                        <option
+                          key={index}
+                          value={
+                            // connection.requester._id === auth.user._id
+                            //   ? connection.requestee._id
+                            //   : connection.requester._id
+                            isItMe(connection.requester._id, auth.user._id)
+                              ? connection.requestee._id
+                              : connection.requester._id
+                          }
+                        >
+                          {/* {connection.requestee.firstName}{" "}
+                      {connection.requestee.lastName} */}
+                          {isItMe(connection.requester._id, auth.user._id)
+                            ? connection.requestee.firstName
+                            : connection.requester.firstName}{" "}
+                          {isItMe(connection.requester._id, auth.user._id)
+                            ? connection.requestee.lastName
+                            : connection.requester.lastName}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          onClick={() => {
-            createListing();
-          }}
-          disabled={alert}
-        >
-          Save
-        </Button>
-        <Button
-          color="gray"
-          onClick={() => setOpenModal(false)}
-          disabled={alert}
-        >
-          Cancel
-        </Button>
-      </Modal.Footer>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            // onClick={() => {
+            //   createListing();
+            // }}
+            type="submit"
+            disabled={alert}
+          >
+            Save
+          </Button>
+          <Button
+            color="gray"
+            // onClick={() => setOpenModal(false)}
+            type="reset"
+            disabled={alert}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </form>
       {alert && (
         <Alert
           color="success"
