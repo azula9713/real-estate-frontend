@@ -289,8 +289,8 @@ function AddListing({ openModal, setOpenModal }: Readonly<Props>) {
           </Button>
           <Button
             color="gray"
-            // onClick={() => setOpenModal(false)}
-            type="reset"
+            onClick={() => setOpenModal(false)}
+            type="button"
             disabled={alert}
           >
             Cancel
