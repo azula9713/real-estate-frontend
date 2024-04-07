@@ -17,6 +17,10 @@ interface IListingDTO extends BaseListing {
   listedUnder: IUser;
 }
 
+interface IListingInput extends BaseListing {
+  listedUnder: string;
+}
+
 interface IListing extends IListingDTO {
   _id: string;
   createdAt: Date;
@@ -32,4 +36,4 @@ interface IListingExpanded extends BaseListing {
   createdBy: IUser;
 }
 
-export type { IListing, IListingDTO, IListingExpanded };
+export type { IListing, IListingDTO, IListingExpanded, IListingInput };

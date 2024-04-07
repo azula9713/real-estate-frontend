@@ -4,7 +4,7 @@ import { useRecoilValue } from "recoil";
 import { authState } from "../../atoms/globalAtoms";
 import { userConnectionsState } from "../../atoms/userAtoms";
 import { ICity } from "../../interfaces/CityInterface";
-import { IListingDTO } from "../../interfaces/ListingInterface";
+import { IListingInput } from "../../interfaces/ListingInterface";
 import ListingServices from "../../services/ListingService";
 import isItMe from "../../utils/isItMe";
 import CityUtils from "../../utils/locationUtils";
@@ -41,7 +41,7 @@ function AddListing({ openModal, setOpenModal }: Readonly<Props>) {
       listingUnderRef.current &&
       propertyTypeRef.current
     ) {
-      const newListing: IListingDTO = {
+      const newListing: IListingInput = {
         title: titleRef.current.value,
         description: descriptionRef.current.value,
         price: parseInt(priceRef.current.value),

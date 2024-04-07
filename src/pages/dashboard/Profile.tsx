@@ -229,7 +229,7 @@ function DashProfile() {
             </div>
             {/* End of about section */}
             <div className="my-4" />
-            {/* Experience and education */}
+            {/* Listing Section */}
             <div className="bg-white p-3 shadow-sm rounded-sm">
               <div className="">
                 <div>

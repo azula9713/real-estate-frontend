@@ -1,7 +1,7 @@
-import { IListing, IListingDTO } from "../interfaces/ListingInterface";
+import { IListing, IListingInput } from "../interfaces/ListingInterface";
 import Server from "./Axios";
 
-const CreateListing = async (listingData: IListingDTO) => {
+const CreateListing = async (listingData: IListingInput) => {
   const response = await Server.post("/listings/create", listingData, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
