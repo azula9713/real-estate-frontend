@@ -19,6 +19,7 @@ import { userConnectionsState, userListingsState } from "../../atoms/userAtoms";
 import AddListing from "../../components/modal/AddListing";
 import DeleteListing from "../../components/modal/DeleteListing";
 import EditListing from "../../components/modal/EditListing";
+import EditUser from "../../components/modal/EditUser";
 import ViewConnections from "../../components/modal/ViewConnections";
 import { IListing } from "../../interfaces/ListingInterface";
 import DashboardLayout from "../../layout/DashboardLayout";
@@ -35,6 +36,7 @@ function DashProfile() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [connectionsModalOpen, setConnectionsModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState<IListing | null>(null);
 
   const changeListingPublishStatus = async (listing: IListing) => {
@@ -93,7 +95,7 @@ function DashProfile() {
               <ul className="bg-gray-100 text-gray-600 hover:text-gray-700 hover:shadow py-2 px-3 mt-3 divide-y rounded shadow-sm">
                 <li className="flex items-center py-3">
                   <span>Status</span>
-                  <span className="ml-auto">
+                  <span className="ml-auto space-x-2">
                     <span className="bg-green-500 py-1 px-2 rounded text-white text-sm">
                       Active
                     </span>
@@ -172,12 +174,23 @@ function DashProfile() {
             {/* Profile tab */}
             {/* About Section */}
             <div className="bg-white p-3 shadow-sm rounded-sm">
-              <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
-                <span className="text-green-500">
-                  <UserIcon className="h-5 w-5" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 font-semibold text-gray-900 leading-8">
+                  <span className="text-green-500">
+                    <UserIcon className="h-5 w-5" />
+                  </span>
+                  <span className="tracking-wide">About</span>
+                </div>
+                <span className="ml-auto text-green-500 cursor-pointer">
+                  <PencilIcon
+                    className="h-4 w-4"
+                    onClick={() => {
+                      setEditProfileModalOpen(true);
+                    }}
+                  />
                 </span>
-                <span className="tracking-wide">About</span>
               </div>
+
               <div className="text-gray-700">
                 <div className="grid md:grid-cols-2 text-sm">
                   <div className="grid grid-cols-2">
@@ -267,7 +280,7 @@ function DashProfile() {
                             }
                             hidden={
                               listing.isAccepted ||
-                              listing.createdBy._id === listing.listedUnder
+                              listing.createdBy._id === listing.listedUnder._id
                             }
                           >
                             Accept Listing
@@ -277,7 +290,10 @@ function DashProfile() {
                             onClick={() =>
                               changeListingAcceptStatus(listing, "reject")
                             }
-                            hidden={listing.isAccepted}
+                            hidden={
+                              listing.isAccepted ||
+                              listing.createdBy._id === listing.listedUnder._id
+                            }
                           >
                             Reject Listing
                           </button>
@@ -329,6 +345,10 @@ function DashProfile() {
                   />
                 </>
               )}
+              <EditUser
+                openModal={editProfileModalOpen}
+                setOpenModal={setEditProfileModalOpen}
+              />
               <AddListing
                 openModal={addModalOpen}
                 setOpenModal={setAddModalOpen}

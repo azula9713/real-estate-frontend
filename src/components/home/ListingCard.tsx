@@ -16,7 +16,7 @@ type Props = {
 
 function ListingCard({ listing, user, addToFavourites }: Readonly<Props>) {
   // get listedUner as IUser type
-  const listedUnder = listing.listedUnder as IUser;
+  const listedUnder = listing.listedUnder;
 
   const navigate = useNavigate();
 

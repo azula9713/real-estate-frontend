@@ -14,7 +14,7 @@ interface BaseListing {
 }
 
 interface IListingDTO extends BaseListing {
-  listedUnder: string;
+  listedUnder: IUser;
 }
 
 interface IListing extends IListingDTO {

@@ -9,6 +9,7 @@ interface IUser {
   userType: number;
   createdAt: string;
   savedListings: string[];
+  rating?: number;
   savedFilters: {
     location: {
       city: string;

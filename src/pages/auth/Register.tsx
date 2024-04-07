@@ -51,6 +51,7 @@ function Register() {
       location,
       savedListings: [],
       savedFilters: [],
+      rating: 0,
     });
 
     if (response.email === email) {
