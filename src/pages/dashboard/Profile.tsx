@@ -246,12 +246,15 @@ function DashProfile() {
                     </div>
                     {auth.user.userType === 1 || auth.user.userType === 2 ? (
                       <span className="text-green-500 cursor-pointer">
-                        <PlusIcon
-                          className="h-5 w-5"
+                        <button
+                          className="text-xs bg-green-500 font-semibold hover:underline text-white p-2 rounded-lg flex items-center space-x-2"
                           onClick={() => {
                             setAddModalOpen(true);
                           }}
-                        />
+                        >
+                          <PlusIcon className="h-5 w-5" />
+                          Add Listing
+                        </button>
                       </span>
                     ) : (
                       <span className="text-green-500 cursor-pointer">
