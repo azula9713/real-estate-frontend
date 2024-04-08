@@ -100,7 +100,7 @@ function ViewConnections({ openModal, setOpenModal }: Readonly<Props>) {
                     key={connection._id}
                     className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-900"
                   >
-                    <div className="flex items-center justify-between space-x-4 w-full text-white">
+                    <div className="flex items-center justify-between space-x-4 w-full dark:text-white text-black">
                       <p>
                         {connection.requestee.firstName}{" "}
                         {connection.requestee.lastName}
@@ -145,7 +145,7 @@ function ViewConnections({ openModal, setOpenModal }: Readonly<Props>) {
               <ul>
                 {receivedConnections.map((connection) => (
                   <li key={connection._id}>
-                    <div className="flex items-center justify-between space-x-4 w-full text-white">
+                    <div className="flex items-center justify-between space-x-4 w-full dark:text-white text-black">
                       <p>
                         {connection.requester.firstName}{" "}
                         {connection.requester.lastName}
