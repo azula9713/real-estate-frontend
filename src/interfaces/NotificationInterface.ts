@@ -7,6 +7,7 @@ interface INotification {
   type: "connection" | "listing";
   message: string;
   read: boolean;
+  deleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

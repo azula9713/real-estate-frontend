@@ -164,7 +164,7 @@ function ViewConnections({ openModal, setOpenModal }: Readonly<Props>) {
                               Accept
                             </button>
                             <button
-                              className="bg-red-500 px-4 py-1 rounded-md text-white"
+                              className="bg-red-500 px-4 py-1 rounded-md dark:text-white text-black"
                               onClick={() =>
                                 updateUserConnection(connection, "rejected")
                               }
@@ -177,7 +177,7 @@ function ViewConnections({ openModal, setOpenModal }: Readonly<Props>) {
                           // if connection is accepted, show remove button
                           connection.status === "accepted" && (
                             <button
-                              className="bg-red-500 px-4 py-1 rounded-md text-white"
+                              className="bg-red-500 px-4 py-1 rounded-md dark:text-white text-black"
                               onClick={() => removeConnection(connection)}
                             >
                               Remove

@@ -5,6 +5,8 @@ import {
   UserIcon,
 } from "@heroicons/react/24/solid";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { authState } from "../atoms/globalAtoms";
 
 type Props = {
   isSidebarOpen: boolean;
@@ -14,6 +16,8 @@ type Props = {
 function DashboardSidebar({ isSidebarOpen, setSidebarOpen }: Readonly<Props>) {
   const openedClass = "translate-x-0";
   const closedClass = "-translate-x-80";
+
+  const auth = useRecoilValue(authState);
 
   const pathURLS = [
     {
@@ -79,26 +83,31 @@ function DashboardSidebar({ isSidebarOpen, setSidebarOpen }: Readonly<Props>) {
       </div>
       <div className="m-4">
         <ul className="mb-4 flex flex-col gap-1">
-          {pathURLS.map((pathURL) => (
-            <li key={pathURL.path}>
-              <button
-                className={`middle none font-sans font-bold transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white w-full flex items-center gap-4 px-4 capitalize 
+          {pathURLS
+            .filter((pathURL) =>
+              //if user type is admin, show all paths, if not hide reports path
+              auth.user.userType === 3 ? true : pathURL.path !== "reports"
+            )
+            .map((pathURL) => (
+              <li key={pathURL.path}>
+                <button
+                  className={`middle none font-sans font-bold transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white w-full flex items-center gap-4 px-4 capitalize 
               ${
                 isCurrentURL(pathURL.path)
                   ? "shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85] bg-gradient-to-tr from-blue-600 to-blue-400"
                   : "hover:bg-white/10 active:bg-white/30"
               }`}
-                onClick={() => {
-                  navigate(`/dashboard/${pathURL.path}`);
-                }}
-              >
-                {pathURL.icon}
-                <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-                  {pathURL.path}
-                </p>
-              </button>
-            </li>
-          ))}
+                  onClick={() => {
+                    navigate(`/dashboard/${pathURL.path}`);
+                  }}
+                >
+                  {pathURL.icon}
+                  <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                    {pathURL.path}
+                  </p>
+                </button>
+              </li>
+            ))}
           {/* <li>
             <button
               className={`middle none font-sans font-bold transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white w-full flex items-center gap-4 px-4 capitalize 

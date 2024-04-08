@@ -13,6 +13,7 @@ import {
   userNotificationsState,
   userSavedListingsState,
 } from "../atoms/userAtoms";
+import { INotification } from "../interfaces/NotificationInterface";
 import AuthServices from "../services/AuthServices";
 import ListingServices from "../services/ListingService";
 import NotificationServices from "../services/NotificationService";
@@ -77,7 +78,9 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
     const fetchUserNotifications = async () => {
       const response = await NotificationServices.GetNotifications();
 
-      setUserNotifications(response);
+      setUserNotifications(
+        response.filter((notification: INotification) => !notification.deleted)
+      );
     };
 
     if (auth.isAuth) {
@@ -169,7 +172,7 @@ function DashboardHeader({ setSidebarOpen }: Readonly<Props>) {
           <div
             className={`${
               notificationPopoverOpen ? "hidden lg:block" : "hidden"
-            } origin-top-right absolute top-16 right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5`}
+            } origin-top-right absolute top-16 z-10 right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5`}
           >
             <div
               className="py-1"
